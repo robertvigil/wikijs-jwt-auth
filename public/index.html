@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiki.js JWT Auth - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #4a5568;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 85, 104, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .message.success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 12px;
+            background: #f0f4ff;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .info h3 {
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        .info ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .info li {
+            margin-bottom: 4px;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .status h3 {
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .status .user-info {
+            margin-top: 8px;
+        }
+
+        .status .user-info div {
+            margin-bottom: 4px;
+        }
+
+        .status .user-info strong {
+            color: #4a5568;
+        }
+
+        .logout-btn {
+            margin-top: 12px;
+            background: #dc3545;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+        }
+
+        .debug-only {
+            display: none;
+        }
+
+        body.debug-mode .debug-only {
+            display: block;
+        }
+
+        body.debug-mode .debug-info {
+            display: block;
+        }
+
+        .debug-info {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="debug-only">Wiki.js JWT Auth</h1>
+        <p class="subtitle debug-only">Independent Authentication Service</p>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required autocomplete="email">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" id="loginBtn">Login</button>
+        </form>
+
+        <div class="message" id="message"></div>
+
+        <div class="status" id="status">
+            <h3 class="debug-only">Current Session</h3>
+            <div class="user-info" id="userInfo"></div>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
+        </div>
+
+        <div class="info debug-only">
+            <h3>About This Service</h3>
+            <p>This service creates Wiki.js-compatible JWT tokens by:</p>
+            <ul>
+                <li>Authenticating against Wiki.js database</li>
+                <li>Signing JWTs with Wiki.js RSA private key</li>
+                <li>Setting cookies that work with Wiki.js and secure-assets</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Check for debug mode
+        const urlParams = new URLSearchParams(window.location.search);
+        const isDebugMode = urlParams.get('debug') === 'true';
+        if (isDebugMode) {
+            document.body.classList.add('debug-mode');
+        }
+
+        // Check if already logged in
+        window.addEventListener('load', checkAuth);
+
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/verify');
+                const data = await response.json();
+
+                if (data.authenticated) {
+                    showLoggedIn(data.user);
+                }
+            } catch (err) {
+                console.error('Auth check failed:', err);
+            }
+        }
+
+        // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const messageDiv = document.getElementById('message');
+
+            // Disable button
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+            messageDiv.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('Login successful!', 'success');
+                    showLoggedIn(data.user);
+                    document.getElementById('loginForm').reset();
+                } else {
+                    showMessage(data.message || 'Login failed', 'error');
+                }
+            } catch (err) {
+                showMessage('Network error: ' + err.message, 'error');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+            }
+        });
+
+        // Logout button
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('Logged out successfully', 'success');
+                    document.getElementById('status').style.display = 'none';
+                    document.getElementById('loginForm').style.display = 'block';
+                }
+            } catch (err) {
+                showMessage('Logout error: ' + err.message, 'error');
+            }
+        });
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showLoggedIn(user) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('status').style.display = 'block';
+
+            const userInfoDiv = document.getElementById('userInfo');
+            const debugInfo = isDebugMode ? `
+                <div class="debug-info"><strong>ID:</strong> ${user.id}</div>
+                <div class="debug-info"><strong>Groups:</strong> ${user.groups.join(', ') || 'none'}</div>
+            ` : '';
+
+            userInfoDiv.innerHTML = `
+                <div><strong>Name:</strong> ${user.name}</div>
+                <div><strong>Email:</strong> ${user.email}</div>
+                ${debugInfo}
+            `;
+        }
+    </script>
+</body>
+</html>

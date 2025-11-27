@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Auth Example</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="container">
+        <div class="logo">
+            <h1>👤 User Profile</h1>
+            <p>View and manage your profile</p>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="profile.html" class="active">Profile</a></li>
+                <li><a href="#" id="logoutLink">Logout</a></li>
+            </ul>
+        </nav>
+
+        <div id="message" class="message"></div>
+
+        <article>
+            <div class="user-info">
+                <h2>Profile Details</h2>
+                <dl>
+                    <dt>Full Name:</dt>
+                    <dd id="userName">Loading...</dd>
+
+                    <dt>Email Address:</dt>
+                    <dd id="userEmail">Loading...</dd>
+
+                    <dt>User ID:</dt>
+                    <dd id="userId">Loading...</dd>
+
+                    <dt>Group Memberships:</dt>
+                    <dd id="userGroups">Loading...</dd>
+
+                    <dt>Account Status:</dt>
+                    <dd><span class="badge">Active</span></dd>
+                </dl>
+            </div>
+
+            <h3>Group Permissions</h3>
+            <div id="groupDetails">
+                <p aria-busy="true">Loading group information...</p>
+            </div>
+
+            <h3>JWT Token Information</h3>
+            <details>
+                <summary>View Raw Token Claims</summary>
+                <pre id="tokenClaims" style="background: var(--card-background-color); padding: 1rem; border-radius: var(--border-radius); overflow-x: auto;">Loading...</pre>
+            </details>
+
+            <div class="actions" style="margin-top: 2rem;">
+                <button onclick="alert('This is a demo - password change not implemented')">Change Password</button>
+                <button class="secondary" onclick="window.location.reload()">Refresh Profile</button>
+            </div>
+        </article>
+
+        <footer>
+            <p>Example app for <a href="https://github.com/yourusername/wikijs-jwt-auth">wikijs-jwt-auth</a></p>
+        </footer>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        const groupDescriptions = {
+            'admin': {
+                name: 'Administrator',
+                description: 'Full access to all system resources and settings',
+                permissions: ['All permissions', 'User management', 'System configuration']
+            },
+            'mgmt': {
+                name: 'Management',
+                description: 'Access to management reports and team oversight',
+                permissions: ['View reports', 'Manage team', 'Approve requests']
+            },
+            'dev': {
+                name: 'Developer',
+                description: 'Access to development tools and repositories',
+                permissions: ['Code access', 'Deploy applications', 'View logs']
+            },
+            'view': {
+                name: 'Viewer',
+                description: 'Read-only access to resources',
+                permissions: ['View content', 'Download reports']
+            }
+        };
+
+        // Require authentication
+        requireAuth().then(user => {
+            // Display user information
+            document.getElementById('userName').textContent = user.name || 'N/A';
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userId').textContent = user.id;
+
+            // Display groups with badges
+            const groupNames = getGroupNames(user.groups || []);
+            const groupsHtml = groupNames.map(name =>
+                `<span class="badge ${name}">${name}</span>`
+            ).join(' ');
+            document.getElementById('userGroups').innerHTML = groupsHtml || '<span class="badge">none</span>';
+
+            // Display group details
+            const groupDetailsHtml = groupNames.map(groupName => {
+                const info = groupDescriptions[groupName] || {
+                    name: groupName,
+                    description: 'Custom group',
+                    permissions: ['Custom permissions']
+                };
+
+                return `
+                    <div class="card">
+                        <h4><span class="badge ${groupName}">${info.name}</span></h4>
+                        <p>${info.description}</p>
+                        <p><strong>Permissions:</strong></p>
+                        <ul>
+                            ${info.permissions.map(p => `<li>${p}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('groupDetails').innerHTML = groupDetailsHtml || '<p>No group memberships</p>';
+
+            // Display raw token claims
+            document.getElementById('tokenClaims').textContent = JSON.stringify(user, null, 2);
+
+        }).catch(error => {
+            // Will redirect to login page
+            console.error('Auth required:', error);
+        });
+
+        // Logout handler
+        document.getElementById('logoutLink').addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            try {
+                await logout();
+                window.location.href = AUTH_CONFIG.LOGIN_PAGE;
+            } catch (error) {
+                showMessage('message', 'Logout failed', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

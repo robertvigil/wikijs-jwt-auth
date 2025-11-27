@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Auth Example</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="container login-page">
+        <div class="logo">
+            <h1>🔐 Auth Example App</h1>
+            <p>Demonstration of JWT authentication integration</p>
+        </div>
+
+        <article>
+            <div id="message" class="message"></div>
+
+            <form id="loginForm">
+                <label for="email">
+                    Email
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required autocomplete="email">
+                </label>
+
+                <label for="password">
+                    Password
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+                </label>
+
+                <button type="submit" id="loginBtn">
+                    Sign In
+                </button>
+            </form>
+        </article>
+
+        <footer>
+            <p>Example app for <a href="https://github.com/yourusername/wikijs-jwt-auth">wikijs-jwt-auth</a></p>
+        </footer>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        const form = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+
+        // Redirect if already logged in
+        redirectIfAuthenticated();
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            loginBtn.disabled = true;
+            loginBtn.setAttribute('aria-busy', 'true');
+            loginBtn.textContent = 'Signing in...';
+            hideMessage('message');
+
+            try {
+                const data = await login(email, password);
+
+                if (data.success) {
+                    showMessage('message', 'Login successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = AUTH_CONFIG.DASHBOARD_PAGE;
+                    }, 500);
+                } else {
+                    showMessage('message', data.message || 'Login failed', 'error');
+                    loginBtn.disabled = false;
+                    loginBtn.removeAttribute('aria-busy');
+                    loginBtn.textContent = 'Sign In';
+                }
+            } catch (error) {
+                showMessage('message', 'Connection error. Make sure the auth service is running on port 3004.', 'error');
+                loginBtn.disabled = false;
+                loginBtn.removeAttribute('aria-busy');
+                loginBtn.textContent = 'Sign In';
+            }
+        });
+    </script>
+</body>
+</html>

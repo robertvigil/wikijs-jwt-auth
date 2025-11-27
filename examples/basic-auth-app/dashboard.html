@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Auth Example</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="container">
+        <div class="logo">
+            <h1>🏠 Dashboard</h1>
+            <p>Welcome to your dashboard</p>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                <li><a href="profile.html">Profile</a></li>
+                <li><a href="#" id="logoutLink">Logout</a></li>
+            </ul>
+        </nav>
+
+        <div id="message" class="message"></div>
+
+        <article>
+            <div class="user-info">
+                <h2>User Information</h2>
+                <dl>
+                    <dt>Name:</dt>
+                    <dd id="userName">Loading...</dd>
+
+                    <dt>Email:</dt>
+                    <dd id="userEmail">Loading...</dd>
+
+                    <dt>User ID:</dt>
+                    <dd id="userId">Loading...</dd>
+
+                    <dt>Groups:</dt>
+                    <dd id="userGroups">Loading...</dd>
+                </dl>
+            </div>
+
+            <div class="card-grid">
+                <div class="card">
+                    <h3>📊 Analytics</h3>
+                    <p>View analytics and reports for your account.</p>
+                    <button onclick="alert('This is a demo - no real functionality')">View Analytics</button>
+                </div>
+
+                <div class="card">
+                    <h3>⚙️ Settings</h3>
+                    <p>Manage your account settings and preferences.</p>
+                    <button onclick="alert('This is a demo - no real functionality')">Manage Settings</button>
+                </div>
+
+                <div class="card">
+                    <h3>👥 Team</h3>
+                    <p>Collaborate with your team members.</p>
+                    <button onclick="alert('This is a demo - no real functionality')">View Team</button>
+                </div>
+            </div>
+
+            <details>
+                <summary>About This Example</summary>
+                <p>
+                    This is a demonstration of integrating with the JWT authentication service.
+                    The page checks for authentication on load, displays user information from the JWT token,
+                    and provides logout functionality.
+                </p>
+                <p>
+                    <strong>Key Features:</strong>
+                </p>
+                <ul>
+                    <li>Protected page that requires authentication</li>
+                    <li>Displays user information from JWT claims</li>
+                    <li>Group-based access control ready</li>
+                    <li>Shared authentication utilities (auth.js)</li>
+                    <li>Responsive design using Pico CSS</li>
+                </ul>
+            </details>
+        </article>
+
+        <footer>
+            <p>Example app for <a href="https://github.com/yourusername/wikijs-jwt-auth">wikijs-jwt-auth</a></p>
+        </footer>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        // Require authentication
+        requireAuth().then(user => {
+            // Display user information
+            document.getElementById('userName').textContent = user.name || 'N/A';
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userId').textContent = user.id;
+
+            // Display groups with badges
+            const groupNames = getGroupNames(user.groups || []);
+            const groupsHtml = groupNames.map(name =>
+                `<span class="badge ${name}">${name}</span>`
+            ).join(' ');
+            document.getElementById('userGroups').innerHTML = groupsHtml || '<span class="badge">none</span>';
+
+            // Welcome message
+            showMessage('message', `Welcome back, ${user.name || user.email}!`, 'success');
+            setTimeout(() => hideMessage('message'), 3000);
+        }).catch(error => {
+            // Will redirect to login page
+            console.error('Auth required:', error);
+        });
+
+        // Logout handler
+        document.getElementById('logoutLink').addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            try {
+                await logout();
+                window.location.href = AUTH_CONFIG.LOGIN_PAGE;
+            } catch (error) {
+                showMessage('message', 'Logout failed', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

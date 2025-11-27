@@ -1,0 +1,252 @@
+/**
+ * Shared styles for example app
+ * Uses Pico CSS as base (loaded via CDN in HTML)
+ */
+
+body {
+    padding: 1rem 0;
+}
+
+/* Narrow container for login page only */
+main.container.login-page {
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Logo/Header */
+.logo {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.logo h1 {
+    margin-bottom: 0.25rem;
+    font-size: 1.75rem;
+}
+
+.logo p {
+    color: var(--muted-color);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Tighter article spacing */
+article {
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Tighter form spacing */
+form label {
+    margin-bottom: 0.75rem;
+}
+
+form input {
+    margin-bottom: 0.5rem;
+}
+
+/* Messages */
+.message {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: var(--border-radius);
+    display: none;
+}
+
+.message.error {
+    background-color: var(--del-color);
+    color: white;
+}
+
+.message.success {
+    background-color: var(--ins-color);
+    color: white;
+}
+
+.message.info {
+    background-color: var(--primary);
+    color: white;
+}
+
+/* User info card */
+.user-info {
+    background: var(--card-background-color);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 2rem;
+}
+
+.user-info h2 {
+    margin-top: 0;
+    font-size: 1.25rem;
+}
+
+.user-info dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem 1rem;
+    margin: 0;
+}
+
+.user-info dt {
+    font-weight: 600;
+    color: var(--muted-color);
+}
+
+.user-info dd {
+    margin: 0;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background: var(--primary);
+    color: white;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    margin-right: 0.25rem;
+}
+
+.badge.admin {
+    background: var(--del-color);
+}
+
+.badge.mgmt {
+    background: var(--primary);
+}
+
+.badge.dev {
+    background: var(--ins-color);
+}
+
+.badge.view {
+    background: var(--muted-color);
+}
+
+/* Demo accounts table */
+.demo-accounts {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--card-background-color);
+    border-radius: var(--border-radius);
+}
+
+.demo-accounts h3 {
+    margin-top: 0;
+    font-size: 1rem;
+}
+
+.demo-accounts table {
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+.demo-accounts th,
+.demo-accounts td {
+    padding: 0.5rem;
+}
+
+/* Navigation */
+nav {
+    margin-bottom: 2rem;
+}
+
+nav ul {
+    display: flex;
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+nav a {
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+}
+
+nav a:hover {
+    background: var(--secondary-hover);
+}
+
+nav a.active {
+    background: var(--primary);
+    color: white;
+}
+
+/* Actions */
+.actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.actions button {
+    flex: 1;
+    min-width: 150px;
+}
+
+/* Cards/Grid */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.card {
+    background: var(--card-background-color);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--muted-border-color);
+}
+
+.card h3 {
+    margin-top: 0;
+    font-size: 1.125rem;
+}
+
+.card p {
+    color: var(--muted-color);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--muted-border-color);
+    color: var(--muted-color);
+    font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem 0;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .actions button {
+        width: 100%;
+    }
+
+    .user-info dl {
+        grid-template-columns: 1fr;
+        gap: 0.25rem;
+    }
+
+    .user-info dt {
+        font-weight: 600;
+    }
+
+    .user-info dd {
+        margin-bottom: 1rem;
+    }
+}
